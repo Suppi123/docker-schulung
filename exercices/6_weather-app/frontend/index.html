@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wetter-App | Docker Schulung</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Wetter-App</h1>
+      <p class="subtitle">Docker Schulung – Übung 6</p>
+    </header>
+
+    <main>
+      <form id="weather-form">
+        <div class="input-group">
+          <input
+            type="text"
+            id="city-input"
+            placeholder="Stadt eingeben (z.B. Berlin, München)"
+            autocomplete="off"
+            required
+          >
+          <button type="submit">Wetter abrufen</button>
+        </div>
+      </form>
+
+      <div id="loading" class="hidden">
+        <p>Lade Wetterdaten…</p>
+      </div>
+
+      <div id="error" class="hidden error-box"></div>
+
+      <div id="result" class="hidden">
+        <section class="location">
+          <h2 id="location-name"></h2>
+          <p id="location-country" class="muted"></p>
+        </section>
+
+        <section class="current-weather">
+          <h3>Aktuelles Wetter</h3>
+          <div class="weather-grid">
+            <div class="weather-card">
+              <span class="label">Temperatur</span>
+              <span id="current-temp" class="value"></span>
+            </div>
+            <div class="weather-card">
+              <span class="label">Luftfeuchtigkeit</span>
+              <span id="current-humidity" class="value"></span>
+            </div>
+            <div class="weather-card">
+              <span class="label">Wind</span>
+              <span id="current-wind" class="value"></span>
+            </div>
+            <div class="weather-card">
+              <span class="label">Bedingungen</span>
+              <span id="current-condition" class="value"></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="forecast">
+          <h3>5-Tage-Vorhersage</h3>
+          <div id="forecast-list" class="forecast-list"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

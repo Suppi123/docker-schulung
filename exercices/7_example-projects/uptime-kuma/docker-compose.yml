@@ -1,0 +1,16 @@
+services:
+
+  app:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    hostname: uptime-kuma
+    restart: always
+    ports:
+      - 3001:3001
+    expose:
+      - 3001
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    volumes:
+      - ${DOCKER_VOLUME_STORAGE:-/mnt/docker-volumes}/uptimekuma:/app/data

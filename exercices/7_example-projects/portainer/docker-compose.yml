@@ -1,0 +1,21 @@
+services:
+
+  portainer:
+    image: portainer/portainer-ce:alpine # or portainer-ee for enterprise edition
+    container_name: portainer-ce # or portainer-ee for enterprise edition
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data:/data
+    ports:
+      - 9443:9443
+    expose:
+      - 9443
+      - 9000
+      - 8000
+
+volumes:
+  portainer_data:
+      external: true
+      name: portainer_data

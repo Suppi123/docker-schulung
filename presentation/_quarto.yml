@@ -1,0 +1,14 @@
+project:
+  type: default
+  output-dir: _output
+
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    transition: slide
+    embed-resources: true
+    # Self-contained HTML for easy web server deployment
+    toc: true
+    toc-location: left
+    toc-title: "Inhalt"
