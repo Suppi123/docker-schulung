@@ -9,6 +9,4 @@ format:
     transition: slide
     embed-resources: true
     # Self-contained HTML for easy web server deployment
-    toc: true
-    toc-location: left
-    toc-title: "Inhalt"
+    toc: false

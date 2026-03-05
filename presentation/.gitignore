@@ -1,3 +1,5 @@
 _output/
 .quarto/
 .env
+/.quarto/
+**/*.quarto_ipynb

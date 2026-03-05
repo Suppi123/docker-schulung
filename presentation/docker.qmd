@@ -1,6 +1,6 @@
 ---
 title: "Docker Schulung"
-subtitle: "Container-Technologie für den Unterricht"
+subtitle: "Container-Technologie für den Einstieg"
 author: "Fabian Kopf"
 
 format:
@@ -11,7 +11,7 @@ format:
     progress: true
     center: false
     code-line-numbers: true
-    footer: "Docker Schulung · Technische Hochschule Augsburg"
+    footer: "Docker Schulung"
     logo: "./images/tha_logo.png"
 
 execute:
@@ -34,11 +34,11 @@ execute:
 }
 
 .reveal pre code {
-  font-size: 0.95em;
+  font-size: 0.92em;
 }
 
 .reveal table {
-  font-size: 0.9em;
+  font-size: 0.88em;
 }
 
 .reveal section img {
@@ -47,428 +47,514 @@ execute:
 }
 
 </style>
-## Agenda: Der Fahrplan (7h)
 
-::: {.incremental}
-1.  **Block 1: Die Welt der Container** (Grundlagen, Architektur, Hello World)
-2.  **Block 2: Das eigene Rezept** (Dockerfiles, Layer-Caching, Best Practices)
-3.  **Block 3: Wo sind meine Daten?** (Volumes, Bind-Mounts, Networking)
-4.  **Block 4: Orchestrierung im Kleinen** (Docker Compose, Multi-Container-Apps)
-5.  **Block 5: Didaktik & Praxis** (Troubleshooting, IHK-Relevanz, Übungsprojekt)
-:::
 
+## Agenda: Der Fahrplan
+
+| Block | Inhalt | Praxis |
+|---|---|---|
+| 1 | Grundlagen und Begriffe | Übung 1 |
+| 2 | Images und Dockerfiles | Übung 2 |
+| 3 | Daten, Mounts und Netzwerke | Übungen 3 und 4 |
+| 4 | Multi-Container mit Compose | Übungen 5 bis 7 |
+| 5 | Troubleshooting, Registries und nächste Schritte | Referenz und Praxis |
+
+Die Schulung verbindet Theorie, Beispiele und praktische Übungen.
+
+## Lernziele
+
+Nach der Schulung kannst du:
+
+- den Unterschied zwischen `Image`, `Container`, `Volume`, `Netzwerk` und `Registry` erklären
+- einfache Container starten, stoppen und analysieren
+- ein eigenes Image mit einem `Dockerfile` bauen
+- Daten korrekt persistieren und Container miteinander verbinden
+- eine kleine Anwendung mit `docker compose` strukturieren
+- typische Fehler schneller diagnostizieren
 
 ## Motivation
 
-Die Umgebung für Entwicklung und Betrieb von Anwendungen aufzusetzen, war früher ein komplexer und fehleranfälliger Prozess. Zusätzlich musste auf Besonderheiten und Unterschiede zwischen verschiedenen Betriebssystemen geachtet werden.
+Die Umgebung für Entwicklung und Betrieb von Anwendungen aufzusetzen, war lange fehleranfällig und oft stark vom Betriebssystem abhängig.
 
-::: {.fragment}
-**Docker vereinfacht** sowohl den Entwicklungs- als auch den Deploymentprozess von Anwendungen.
-:::
+Docker vereinfacht diesen Prozess:
 
-::: {.fragment}
-- Ein Befehl → komplette Umgebung
-- Gleiche Umgebung auf Windows, Mac, Linux
-- Ein standardisiertes Paket für Deployment
-:::
+- gleiche Umgebung auf verschiedenen Systemen
+- schneller Start neuer Projekte
+- reproduzierbare Builds und Setups
+- klarere Trennung von Anwendung und Laufzeitumgebung
 
-## Was ist ein Container?
+## Block 1: Warum Docker?
 
-Ein **Container** ist ein alleinstehendes, ausführbares Softwarepaket, das alles beinhaltet, was die Anwendung benötigt, um zu laufen:
+Docker löst in Entwicklung und Betrieb ein bekanntes Problem:
 
-- Betriebssystem
-- Laufzeitabhängigkeiten (z.B. Python Runtime)
-- Bibliotheken
-- Code der Anwendung
+- Anwendungen laufen oft nur auf einem bestimmten Rechner
+- Abhängigkeiten kollidieren miteinander
+- Setups kosten viel Zeit
+- Fehlersuche wird unübersichtlich
 
-::: {.fragment}
-**Analogie (OOP):** Container-Images ≈ Klassen · Container ≈ Objekte/Instanzen einer Klasse
-:::
+**Mehrwert von Docker:** gleiche Startbasis auf vielen Systemen und schnell reproduzierbare Umgebungen.
 
-## Open Container Initiative (OCI)
+## Zentrale Begriffe
 
-Docker ist eine Implementierung des **OCI-Standards**. Dieser legt fest:
+| Begriff | Kurz erklärt |
+|---|---|
+| `Image` | Bauplan einer Anwendung |
+| `Container` | laufende Instanz eines Images |
+| `Registry` | Speicherort für Images |
+| `Volume` | persistenter Speicher außerhalb des Containers |
+| `Network` | Verbindung zwischen Containern |
+| `Docker Compose` | Beschreibung mehrerer Services in YAML |
 
-- **Image-Spezifikationen:** Metadata und Datenformat
-- **Laufzeit-Spezifikationen:** Wie Container auf Basis von Images gestartet werden
-- **Verteilungs-Spezifikationen:** Wie Images verteilt werden (Registries, Push, Pull)
+## Container vs. virtuelle Maschinen
 
-## Geschichte: Arten, eine Anwendung zu installieren
+| Container | Virtuelle Maschine |
+|---|---|
+| teilen sich den Host-Kernel | eigenes Gast-Betriebssystem |
+| starten schnell | schwergewichtiger |
+| gut für isolierte Anwendungen | gut für komplette Systemabbilder |
+| ideal für Web-Apps, APIs und Services | sinnvoll für vollständige Server-Simulation |
 
 ## Bare Metal
 
 Alles direkt auf dem Host-Betriebssystem installiert.
 
-**Nachteile:** Dependency-Konflikte, Server unter Umständen schlecht ausgelastet.
+**Nachteile:** Dependency-Konflikte, schwierige Updates, schlechtere Trennung.
 
-![Bare Metal](images/bare_metal.png){width=65%}
+![Bare Metal](images/bare_metal.png){width=68%}
 
 ## Virtual Machines
 
-Keine Dependency-Konflikte, bessere Auslastung – aber ressourcenintensiv.
+Virtuelle Maschinen kapseln Anwendungen sauberer, brauchen aber mehr Ressourcen.
 
-![Virtual Machines](images/virtual_machine.png){width=65%}
+![Virtual Machines](images/virtual_machine.png){width=68%}
 
 ## Container
 
-Keine Dependency-Konflikte, noch bessere Auslastung als VMs – **leichtgewichtig**.
+Container sind leichter als VMs und teilen sich den Kernel des Hosts.
 
-Container nutzen den Host-Kernel – daher schnell und schlank.
+![Container](images/container.png){width=68%}
 
-![Container](images/container.png){width=65%}
-
-## Linux Building Blocks
-
-Die technische Grundlage von Containern:
-
-- **cgroups** – Ressourcenbegrenzung (CPU, RAM, I/O)
-- **namespaces** – Isolation (Prozesse, Netzwerk, Dateisystem)
-- **Union Filesystems** – effiziente Schichten für Images
-
-## Docker Software: Client
-
-- Command Line Interface (CLI)
-- Graphical User Interface (GUI)
-- Credential Helper
-- Extensions
-
-## Docker Software: Daemon
-
-Die **Linux-(virtuelle) Maschine** enthält:
-
-- **Docker Daemon** (`dockerd`) – verwaltet Container, Images, Netzwerke, Volumes
-
-## Docker Engine vs. Docker Desktop
-
-| Komponente | Inhalt |
-|------------|--------|
-| **Docker Engine** | CLI + Daemon (`dockerd`) |
-| **Docker Desktop** | Engine + GUI + zusätzliche Tools |
-
-## Docker Swarm
-
-Existiert als eingebaute Orchestrierungs-Lösung – Alternative zu Kubernetes für einfachere Szenarien.
-
-## Container Registries (Überblick)
-
-Registries gehören nicht direkt zu Docker, werden aber verwendet, um Container zu **speichern**, zu **verwalten** und zu **teilen**.
-
-**Beispiele:** Docker Hub, GitHub Container Registry, GitLab, Harbor
-
-## Übung 1: Den ersten Container starten
-
-**Ziel:** Prüfen, ob Docker läuft und ein erstes Image ausführen.
+## Was passiert bei `docker run`?
 
 ```bash
 docker run hello-world
 ```
 
-Weiteres Beispiel (PostgreSQL):
+1. Docker prüft, ob das Image lokal existiert.
+2. Falls nicht, wird es aus einer Registry geladen.
+3. Docker erstellt einen Container aus dem Image.
+4. Der Startbefehl wird ausgeführt.
+
+Das ist ein sehr guter erster Funktionstest für jede Docker-Umgebung.
+
+## Docker Engine in 60 Sekunden
+
+- Das CLI nimmt den Befehl entgegen, z.B. `docker run`
+- Der Docker-Daemon verwaltet Images, Container, Netzwerke und Volumes
+- Die Registry liefert Images, wenn sie lokal noch nicht vorhanden sind
+- Auf Linux läuft Docker direkt auf dem Kernel, auf Windows/macOS meist in einer Linux-VM
+
+## Übung 1: Den ersten Container starten
+
+**Ziel:** Prüfen, ob Docker läuft und das Grundprinzip sichtbar machen.
 
 ```bash
-docker run -e POSTGRES_PASSWORD=foobarbaz -p 5432:5432 postgres:15.1-alpine
+docker run hello-world
 ```
 
-::: {.fragment}
-- `docker run` = Image starten (wird bei Bedarf automatisch heruntergeladen)
-- `-e` = Umgebungsvariable · `-p` = Port-Mapping (Host:Container)
-:::
+**Worauf solltest du achten?**
 
-## Übung 1: Los geht's
-
-**Aufgabe:** Führe `docker run hello-world` aus und prüfe die Ausgabe.
+- Wurde das Image lokal gefunden oder heruntergeladen?
+- Welche Ausgabe kommt aus dem Container?
+- Was bleibt nach dem Beenden übrig, was nicht?
 
 → `exercices/1_hello-world/`
 
+## Kurzfazit Block 1
+
+- Ein `Image` ist der Bauplan, ein `Container` die laufende Instanz.
+- `docker run` ist Start, Download und Ausführung in einem Ablauf.
+- Der Einstieg mit `hello-world` zeigt das Prinzip sofort und ohne viel Vorwissen.
+
+## Block 2: Images und Dockerfiles
+
+Ab hier wird Docker produktiv:
+
+- wir bauen ein eigenes Image
+- wir beschreiben den Build reproduzierbar
+- wir trennen Dateien, Build-Schritte und Startbefehl
+
+Das passt direkt zu `exercices/2_small-web-server/`.
+
+## Was ist ein Dockerfile?
+
+Ein `Dockerfile` ist das Rezept zum Erzeugen eines Images.
+
+Typische Reihenfolge:
+
+1. Basis-Image wählen
+2. Arbeitsverzeichnis setzen
+3. Abhängigkeiten installieren
+4. Anwendung kopieren
+5. Startbefehl festlegen
+
+## Wichtige Dockerfile-Anweisungen
+
+| Anweisung | Zweck |
+|---|---|
+| `FROM` | Basis-Image festlegen |
+| `WORKDIR` | Arbeitsordner setzen |
+| `COPY` | Dateien ins Image kopieren |
+| `RUN` | Build-Schritt ausführen |
+| `EXPOSE` | genutzten Port dokumentieren |
+| `CMD` | Standard-Startbefehl definieren |
+
+## Layer und Caching
+
+Images bestehen aus Schichten. Das ist wichtig für Geschwindigkeit und Verständlichkeit.
+
+```Dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+CMD ["npm", "start"]
+```
+
+![Container Dateisystem](images/container_filesystem.png){width=58%}
+
+Warum diese Reihenfolge?
+
+- Abhängigkeiten ändern sich seltener als Quellcode.
+- Docker kann den `npm ci`-Schritt wiederverwenden.
+- Builds werden dadurch lokal und in CI deutlich schneller.
+
+## Build-Kontext und `.dockerignore`
+
+Beim Bauen wird ein Kontext an Docker gesendet. Alles im Kontext kostet Zeit und kann Probleme verursachen.
+
+![.dockerignore](images/dockerignore.png){width=72%}
+
+`.dockerignore` sollte mindestens ausschließen:
+
+- `node_modules`
+- Build-Artefakte
+- lokale `.git`-Ordner
+- temporäre Dateien
+- Geheimnisse und `.env`-Dateien, falls sie nicht ins Image gehören
+
+## Dockerfile-Best-Practices
+
+- kleine Basis-Images bevorzugen, z.B. `alpine` nur wenn passend
+- Tags bewusst setzen statt blind `latest` zu verwenden
+- keine Zugangsdaten in Images kopieren
+- ein Container, eine Hauptaufgabe
+- Reihenfolge im Dockerfile cache-freundlich wählen
+- `EXPOSE` dokumentiert den Port, gibt ihn aber nicht automatisch frei
+
 ## Übung 2: Einfacher Webserver
 
-**Ziel:** Eigenes Image bauen und einen Webserver starten.
+**Ziel:** Erstes eigenes Image bauen und lokal testen.
 
 ```bash
 docker build -t simple-webserver .
 docker run -d -p 80:80 --name simple-webserver simple-webserver
 ```
 
-::: {.fragment}
-- `-t` = Tag/Name für das Image · `-d` = im Hintergrund
-- `-p 80:80` = Port-Mapping (Host:Container) · `--name` = Container benennen
-:::
+**Worauf solltest du achten?**
 
-## Übung 2: Los geht's
-
-**Aufgaben:**
-
-1. Image bauen: `docker build -t simple-webserver .`
-2. Container starten: `docker run -d -p 80:80 --name simple-webserver simple-webserver`
-3. Im Browser prüfen: http://localhost
+- Welche Dateien landen im Image?
+- Was wäre der Unterschied zwischen `COPY . .` und einem selektiven `COPY`?
+- Warum ist `-p 80:80` nötig?
 
 → `exercices/2_small-web-server/`
 
-## Was ist ein Dockerfile?
+## Kurzfazit Block 2
 
-Ein **Dockerfile** ist die Anleitung zum Bauen eines Images:
+- `Dockerfile` bedeutet: Build-Prozess dokumentieren statt manuell klicken.
+- Layer-Caching spart Zeit und macht Builds schneller.
+- Gute Dockerfiles sind klein, klar und reproduzierbar.
 
-```
-1. Basis-Image (z.B. nginx:alpine)
-2. Abhängigkeiten installieren
-3. Code/Dateien kopieren
-4. Startbefehl definieren
-```
+## Block 3: Daten, Mounts und Netzwerke
 
-## Container-Images: Schichten
+Jetzt kommt ein wichtiger Punkt in der Praxis:
 
-Images bestehen aus übereinanderliegenden **Layern** (Union Filesystem).
+- Container sind nicht automatisch dauerhaft
+- Daten liegen nicht "einfach so" auf dem Host
+- mehrere Container brauchen ein gemeinsames Netzwerkmodell
 
-![Container Dateisystem](images/container_filesystem.png){width=55%}
+## Container sind ephemer
 
-## Wichtige Dockerfile-Anweisungen
+Ein Container ist für Ausführung gedacht, nicht als dauerhafte Ablage.
 
-| Anweisung | Zweck |
-|-----------|-------|
-| `FROM` | Basis-Image |
-| `WORKDIR` | Arbeitsverzeichnis |
-| `COPY` | Dateien ins Image kopieren |
-| `RUN` | Befehl beim Bauen ausführen |
-| `EXPOSE` | Port dokumentieren |
-| `CMD` | Standard-Startbefehl |
+Wichtig dabei:
 
-## .dockerignore
+- Änderungen im beschreibbaren Layer gehen beim Entfernen des Containers verloren
+- das ist kein Fehler, sondern Teil des Konzepts
+- Persistenz wird bewusst über Volumes oder Bind Mounts hergestellt
 
-Nutze `.dockerignore`, um unnötige Dateien aus dem Build-Kontext auszuschließen.
+## Named Volumes vs. Bind Mounts
 
-![.dockerignore](images/dockerignore.png){width=70%}
+| Typ | Wann sinnvoll? | Vorteil |
+|---|---|---|
+| Named Volume | Datenbank, App-Daten, langlebige Daten | Docker verwaltet den Speicherort |
+| Bind Mount | Entwicklung, Konfiguration, Dateiaustausch | Host-Dateien direkt sichtbar |
 
-## Datenpersistenz: Warum Volumes?
+Beispiele aus der Praxis:
 
-Container bestehen aus verschiedenen **Layern**. Nur der letzte Layer ist read/write.
-
-![Container Dateisystem](images/container_filesystem.png){width=50%}
-
-## Datenpersistenz: Ephemeral
-
-Zur Laufzeit kannst du z.B. Software im Container installieren – nach einem **Neustart** ist der Container aber wieder im Ausgangszustand.
-
-Man kann Container benennen, um Änderungen zu erhalten – aber grundsätzlich will man **keine Daten im Container** persistieren. Dafür nutzt man **Volumes** und **Mounts**.
+- Postgres-Daten in ein Volume
+- Frontend-Quellcode im Entwicklungsmodus als Bind Mount
 
 ## Übung 3: Datenpersistenz
 
-**Problem:** Container sind ephemer – beim Beenden gehen Daten verloren.
+Die Übung zeigt genau die drei Kernideen:
 
-**Zwei Lösungen:**
-
-1. **Named Volumes** – Docker verwaltet den Speicherort
-2. **Bind Mounts** – Host-Verzeichnis direkt einbinden
-
-## Übung 3: Los geht's
-
-**Aufgaben:**
-
-1. **Ephemeral:** Ubuntu-Container starten, `ping` installieren, exit – in neuem Container prüfen: ping fehlt
-2. **Named Volume:** Volume erstellen, Datei in `/my-data/` speichern, in neuem Container prüfen
-3. **Bind Mount:** Host-Verzeichnis mounten, Datei speichern, auf Host sichtbar?
+1. Ein Container vergisst lokale Änderungen
+2. Ein Named Volume bewahrt Daten
+3. Ein Bind Mount verbindet Container und Host-Dateisystem
 
 → `exercices/3_datenpersistenz/`
 
-## Named Volumes (Volume Mounts)
+## Docker-Netzwerke verstehen
 
-```bash
-docker volume create my-volume
-docker run -it --rm -v my-volume:/my-data ubuntu:22.04
-```
+Für Übung 4 braucht es ein gemeinsames Modell:
 
-::: {.fragment}
-- Daten überleben Container-Neustarts
-- Docker verwaltet Speicherort
-- Ideal für Datenbanken, Log-Daten, etc.
-:::
-
-## Bind Mounts
-
-```bash
-docker run -it --rm -v ${PWD}/my-data:/my-data ubuntu:22.04
-```
-
-::: {.fragment}
-- Host-Verzeichnis direkt gemountet
-- Ideal für Entwicklung (Live-Reload)
-- Daten sichtbar auf dem Host
-:::
+- Container im selben benutzerdefinierten Netzwerk erreichen sich über ihren Namen
+- `localhost` im Container ist nicht der Host
+- veröffentlichte Ports (`-p`) sind für Zugriffe von außen
+- interne Kommunikation läuft meist über Container-Namen und interne Ports
 
 ## Übung 4: Multi-Container-Anwendung
 
-**Ziel:** Mehrere Container über ein Netzwerk verbinden.
+**Architektur aus der Übung:**
 
-**Architektur:**
-
-- PostgreSQL (Datenbank)
+- PostgreSQL
 - Node.js API
 - Golang API
-- React-Client (Nginx)
+- React-Client mit Nginx
 
-## Übung 4: Los geht's
+Die Übung zeigt hier sehr gut:
 
-**Aufgaben:**
-
-1. Netzwerk `my-network` erstellen
-2. PostgreSQL starten (Volume `pgdata`)
-3. Node-API & Golang-API bauen und starten
-4. React-Client bauen und starten
-5. Aufräumen: `docker stop` → `docker rm` → `docker network rm`
+- warum `db` im `DATABASE_URL` funktioniert
+- warum ein Netzwerk nötig ist
+- warum Datenbanken fast immer ein Volume brauchen
 
 → `exercices/4_application/`
 
-## Docker-Netzwerke
+## Typische Fehlerbilder in Block 3
 
-```bash
-docker network create my-network
-docker run --network my-network --name db -e POSTGRES_PASSWORD=... postgres:15.1-alpine
-docker run --network my-network -e DATABASE_URL=postgres://postgres:...@db:5432/... api-node
+- Port ist schon belegt
+- Container spricht auf `localhost` statt auf den Service-Namen
+- Daten sind "weg", weil kein Volume verwendet wurde
+- falscher Zielpfad im Mount
+- Netzwerkname oder Containername stimmt nicht
+
+**Bewährte Diagnosebefehle:** `docker ps`, `docker logs <name>`, `docker volume ls`, `docker network ls`
+
+## Kurzfazit Block 3
+
+- Persistenz muss bewusst geplant werden.
+- `Volume` und `Bind Mount` sind nicht dasselbe.
+- Netzwerke erklären, warum Multi-Container-Anwendungen zuverlässig miteinander sprechen.
+
+## Block 4: Multi-Container mit Docker Compose
+
+Ab jetzt wird aus vielen Einzelbefehlen eine strukturierte Konfiguration.
+
+Compose ist praktisch, weil es:
+
+- Komplexität reduziert
+- Architektur sichtbar macht
+- Änderungen versionierbar macht
+
+## Warum Compose?
+
+Ohne Compose besteht Übung 4 aus vielen `docker run`-Befehlen.
+
+Mit Compose werden Services, Netzwerke und Volumes in einer Datei beschrieben:
+
+- leichter lesbar
+- leichter zu ändern
+- leichter zu verstehen
+
+## Compose-Datei lesen
+
+```yaml
+services:
+  db:
+    image: postgres:15.1-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: ./api
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
 ```
 
-::: {.fragment}
-- Container im gleichen Netzwerk können sich per **Namen** erreichen (`db`, `api-node`)
-- `-e` = Umgebungsvariablen setzen
-:::
+Wichtig: Servicenamen werden im Compose-Netzwerk automatisch zu DNS-Namen.
 
-## Übung 5: Docker Compose
+## Compose: Wichtige Konzepte
 
-**Ziel:** Übung 4 mit einer YAML-Datei statt vieler `docker run`-Befehle.
+- `services`: welche Container zur Anwendung gehören
+- `build` oder `image`: selbst bauen oder fertiges Image nutzen
+- `ports`: Host-Port zu Container-Port
+- `volumes`: dauerhafte Daten
+- `depends_on`: Startreihenfolge, aber nicht automatisch "bereit"
+- `networks`: gezielte Trennung oder Kopplung von Services
+
+## Zusatzwissen: `depends_on` ist keine Readiness-Prüfung
+
+Das ist wichtig, weil es in Projekten oft falsch verstanden wird.
+
+- `depends_on` startet Services in einer Reihenfolge
+- es prüft nicht automatisch, ob die Datenbank schon Anfragen annimmt
+- für robuste Setups helfen `healthcheck`, Retry-Logik oder ein Wait-Script
+
+Für den Einstieg reicht oft zuerst das Grundmodell. Später kannst du mit `healthcheck` oder Retry-Logik nachschärfen.
+
+## Übung 5: Von `docker run` zu Compose
+
+**Ziel:** Die Multi-Container-Anwendung aus Übung 4 in YAML ausdrücken.
+
+Empfohlene Befehle:
 
 ```bash
 docker compose build
 docker compose up -d
+docker compose ps
+docker compose down
 ```
-
-::: {.fragment}
-- `docker-compose.yml` definiert Services, Netzwerke, Volumes
-- `depends_on` steuert Startreihenfolge
-- `docker compose down` räumt alles auf
-:::
-
-## Übung 5: Los geht's
-
-**Aufgaben:**
-
-1. `docker compose build` – alle Images bauen
-2. `docker compose up -d` – Anwendung starten
-3. Im Browser testen (Port 80)
-4. `docker compose down` – alles aufräumen
 
 → `exercices/5_docker-compose/`
 
 ## Übung 6: Wetter-App
 
-**Ziel:** Eigenständig Dockerfiles und Docker Compose erstellen.
+Hier wendest du das Gelernte selbstständiger an.
 
-**Architektur:**
+Sie erstellen:
 
-- **Backend:** Python/Flask (Open-Meteo API)
-- **Frontend:** HTML/JS + Nginx (Proxy zu Backend)
+- ein Dockerfile für das Python-Backend
+- ein Dockerfile für das Nginx-Frontend
+- eine `docker-compose.yml` für beide Services
+
+Hier überträgst du das Gelernte auf eine neue Struktur statt nur nachzubauen.
 
 → `exercices/6_weather-app/`
 
-## Übung 6: Aufgaben
+## Übung 7: Praxisbeispiele mit Compose
 
-1. **Backend-Dockerfile** – Python-Image, `pip install -r requirements.txt`, `app.py` kopieren, Port 5000
-2. **Frontend-Dockerfile** – Nginx-Alpine, `index.html`, `style.css`, `app.js`, `nginx.conf`, Port 80
-3. **docker-compose.yml** – `frontend` + `backend`, gemeinsames Netzwerk, Port 8080, `depends_on`
+Mögliche Beispiele aus dem Repo:
 
-Nginx proxied `/api/` an den Backend-Container. → `exercices/6_weather-app/`
+- Portainer
+- Uptime Kuma
+- Homepage
+- Home Assistant
 
-## Übung 7: Bonus – Praxisbeispiele
+Diese Beispiele zeigen typische reale Compose-Setups:
 
-Starte eine echte Anwendung mit Docker Compose:
-
-- **Portainer** – Web-UI für Docker
-- **Uptime Kuma** – Monitoring
-
-## Übung 7: Weitere Beispiele
-
-- **Homepage** – Dashboard für Selfhosted-Services
-- **Home Assistant** – Home-Automation
-
-## Übung 7: Los geht's
-
-**Aufgabe:** Wähle ein Projekt (Portainer, Uptime Kuma, Homepage, …), finde die `docker-compose.yml` und starte die Anwendung mit `docker compose up -d`.
+- Welche Volumes werden genutzt?
+- Welche Ports werden veröffentlicht?
+- Welche Einstellungen wirken produktionsnah?
 
 → `exercices/7_example-projects/`
 
-## Wichtige docker run Optionen (1/2)
+## Compose-Troubleshooting
 
-| Option | Bedeutung |
-|--------|-----------|
-| `-d` | Im Hintergrund (detached) |
-| `-p HOST:CONTAINER` | Port-Mapping |
-| `-e VAR=wert` | Umgebungsvariable |
-| `-v volume:/pfad` | Volume mounten |
+Die wichtigsten Befehle:
 
-## Wichtige docker run Optionen (2/2)
+| Befehl | Nutzen |
+|---|---|
+| `docker compose config` | YAML prüfen und aufgelöst anzeigen |
+| `docker compose ps` | Status sehen |
+| `docker compose logs -f` | Logs live verfolgen |
+| `docker compose exec <service> sh` | in einen Service hineinschauen |
+| `docker compose down` | Umgebung sauber abbauen |
 
-| Option | Bedeutung |
-|--------|-----------|
-| `--network NAME` | Netzwerk verbinden |
-| `--name NAME` | Container benennen |
-| `--rm` | Container nach Beendigung löschen |
-| `-it` | Interaktiv + TTY |
+Hinweis: `docker compose down -v` löscht auch Volumes und damit oft absichtlich gespeicherte Daten.
 
-## Wichtige Docker Compose Befehle
+## Kurzfazit Block 4
 
-| Befehl | Bedeutung |
-|--------|-----------|
-| `docker compose up -d` | Services starten (Hintergrund) |
-| `docker compose down` | Alles stoppen und entfernen |
-| `docker compose build` | Images bauen |
-| `docker compose logs -f` | Logs anzeigen |
-| `docker compose ps` | Status der Container |
+- Compose macht Architektur lesbar und wartbar.
+- Service-Namen sind im Compose-Netzwerk gleichzeitig Kommunikationsnamen.
+- Für komplexere Szenarien lohnt sich der Hinweis auf `healthcheck` und strukturierte Fehlersuche.
+
+## Block 5: Troubleshooting und nächste Schritte
+
+Zum Einstieg gehört auch, typische Probleme schnell einzuordnen.
+
+Häufige Fragen:
+
+- Warum startet ein Container nicht?
+- Warum ist ein Port nicht erreichbar?
+- Warum fehlen Daten nach einem Neustart?
+- Warum findet ein Container einen anderen Service nicht?
+
+## Typische Diagnosebefehle
+
+| Befehl | Nutzen |
+|---|---|
+| `docker ps -a` | laufende und gestoppte Container anzeigen |
+| `docker logs <name>` | Ausgabe eines Containers ansehen |
+| `docker exec -it <name> sh` | in einen laufenden Container wechseln |
+| `docker inspect <name>` | Details zu Container, Netzwerk und Mounts |
+| `docker compose logs -f` | Logs einer Compose-Umgebung verfolgen |
 
 ## Aufräumen
 
 ```bash
-# Einzelne Container
 docker stop <name>
 docker rm <name>
-
-# Netzwerk
-docker network rm my-network
-
-# Alles auf einmal
-docker system prune -a
+docker compose down
+docker volume ls
+docker network ls
 ```
 
-## Aufräumen – Vorsicht
+Vorsicht bei `docker system prune -a`: dabei werden ungenutzte Images ebenfalls entfernt.
 
-**`prune -a`** löscht alle ungenutzten Images!
+## Container Registries
 
-## Container Registries (Referenz)
+Images werden in Registries gespeichert und verteilt.
 
-Images werden in **Registries** gespeichert und verteilt – Docker Hub, GitHub, GitLab, Harbor, etc.
+Beispiele:
 
-## Container Registries – Befehle
+- Docker Hub
+- GitHub Container Registry
+- GitLab Container Registry
+- Harbor
+
+## Container Registries: Befehle
 
 ```bash
-docker pull postgres:15.1-alpine   # Image herunterladen
-docker push meinuser/meinimage    # Eigenes Image hochladen
+docker pull postgres:15.1-alpine
+docker push meinuser/meinimage
 ```
 
-`docker run postgres:15.1-alpine` lädt bei Bedarf automatisch von Docker Hub.
+`docker run postgres:15.1-alpine` lädt das Image bei Bedarf automatisch aus einer Registry.
 
-## Zusammenfassung (1/2)
+## Wie geht es weiter?
 
-- **Container** = isolierte, portable Softwarepakete
-- **Dockerfile** = Rezept für Images
-- **Volumes** = Daten persistieren (named volumes, bind mounts)
+Nach diesem Einstieg bieten sich als nächste Themen an:
 
-## Zusammenfassung (2/2)
+- Multi-Stage-Builds
+- eigene Registries und Image-Versionierung
+- CI/CD mit Docker
+- Reverse Proxy und Deployment
+- später auch Kubernetes als nächster Schritt
 
-- **Netzwerke** = Container verbinden
-- **Docker Compose** = Multi-Container-Apps einfach definieren
+## Kurzfazit Block 5
 
-**Cheatsheet:** `exercices/cheatsheet.md`
+- Mit Logs, Inspect und Compose-Befehlen lassen sich viele Fehler schnell eingrenzen.
+- Registries sind die Drehscheibe für das Verteilen von Images.
+- Nach dem Einstieg folgt meist der Weg zu saubereren Builds und realen Deployments.
 
-## Vielen Dank!
+## Abschluss und Referenzen
 
-**Weiterführende Ressourcen:**
-
-- [Docker: Beginner to Pro](https://courses.devopsdirective.com/docker-beginner-to-pro/)
-- [Docker Dokumentation](https://docs.docker.com/)
-- [Docker Tutorial (YouTube)](https://www.youtube.com/watch?v=9ivFrXgB2Zg&t=110s)
+- Cheatsheet: `exercices/cheatsheet.md`
+- Übungen: `exercices/`
+- Dokumentation: [docs.docker.com](https://docs.docker.com/)
+- Compose-Referenz: [docs.docker.com/compose](https://docs.docker.com/compose/)
