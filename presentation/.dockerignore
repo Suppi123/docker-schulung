@@ -1,0 +1,7 @@
+_output
+.quarto
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml

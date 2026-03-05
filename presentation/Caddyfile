@@ -1,0 +1,6 @@
+{$DOMAIN} {
+  root * /srv
+  encode zstd gzip
+  try_files {path} /docker.html
+  file_server
+}
