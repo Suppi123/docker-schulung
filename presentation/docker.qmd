@@ -1,6 +1,6 @@
 ---
-title: "Docker Schulung"
-subtitle: "Container-Technologie für den Einstieg"
+title: "Docker Grundlagen"
+subtitle: "Docker-Grundlagen für die Praxis"
 author: "Fabian Kopf"
 
 format:
@@ -22,15 +22,15 @@ execute:
 <style>
 
 :root {
-  --tha-blue: #FF0350;
+  --tha-color: #FF0350;
 }
 
 .reveal h1, .reveal h2, .reveal h3 {
-  color: var(--tha-blue);
+  color: var(--tha-color);
 }
 
 .reveal .progress {
-  color: var(--tha-blue);
+  color: var(--tha-color);
 }
 
 .reveal pre code {
@@ -49,7 +49,7 @@ execute:
 </style>
 
 
-## Agenda: Der Fahrplan
+## Agenda:
 
 | Block | Inhalt | Praxis |
 |---|---|---|
@@ -59,29 +59,18 @@ execute:
 | 4 | Multi-Container mit Compose | Übungen 5 bis 7 |
 | 5 | Troubleshooting, Registries und nächste Schritte | Referenz und Praxis |
 
-Die Schulung verbindet Theorie, Beispiele und praktische Übungen.
-
 ## Lernziele
-
-Nach der Schulung kannst du:
 
 - den Unterschied zwischen `Image`, `Container`, `Volume`, `Netzwerk` und `Registry` erklären
 - einfache Container starten, stoppen und analysieren
 - ein eigenes Image mit einem `Dockerfile` bauen
 - Daten korrekt persistieren und Container miteinander verbinden
-- eine kleine Anwendung mit `docker compose` strukturieren
+- kleine Anwendungen mit `docker compose` strukturieren
 - typische Fehler schneller diagnostizieren
 
 ## Motivation
 
-Die Umgebung für Entwicklung und Betrieb von Anwendungen aufzusetzen, war lange fehleranfällig und oft stark vom Betriebssystem abhängig.
-
-Docker vereinfacht diesen Prozess:
-
-- gleiche Umgebung auf verschiedenen Systemen
-- schneller Start neuer Projekte
-- reproduzierbare Builds und Setups
-- klarere Trennung von Anwendung und Laufzeitumgebung
+![Works on my Machine](images/works_on_my_machine.png){width=50%}
 
 ## Block 1: Warum Docker?
 
@@ -105,15 +94,6 @@ Docker löst in Entwicklung und Betrieb ein bekanntes Problem:
 | `Network` | Verbindung zwischen Containern |
 | `Docker Compose` | Beschreibung mehrerer Services in YAML |
 
-## Container vs. virtuelle Maschinen
-
-| Container | Virtuelle Maschine |
-|---|---|
-| teilen sich den Host-Kernel | eigenes Gast-Betriebssystem |
-| starten schnell | schwergewichtiger |
-| gut für isolierte Anwendungen | gut für komplette Systemabbilder |
-| ideal für Web-Apps, APIs und Services | sinnvoll für vollständige Server-Simulation |
-
 ## Bare Metal
 
 Alles direkt auf dem Host-Betriebssystem installiert.
@@ -134,7 +114,33 @@ Container sind leichter als VMs und teilen sich den Kernel des Hosts.
 
 ![Container](images/container.png){width=68%}
 
-## Was passiert bei `docker run`?
+## Container vs. virtuelle Maschinen
+
+| Container | Virtuelle Maschine |
+|---|---|
+| teilen sich den Host-Kernel | eigenes Gast-Betriebssystem |
+| starten schnell | schwergewichtiger |
+| gut für isolierte Anwendungen | gut für komplette Systemabbilder |
+| ideal für Web-Apps, APIs und Services | sinnvoll für vollständige Server-Simulation |
+
+## OCI und Docker
+
+Die `Open Container Initiative (OCI)` definiert offene Standards für Container.
+
+| OCI-Spezifikation | Beschreibt |
+|---|---|
+| `Image Specification` | Aufbau und Metadaten eines Images |
+| `Runtime Specification` | wie ein Container aus einem Image gestartet wird |
+| `Distribution Specification` | Austausch über Registries, Push und Pull |
+
+Wichtig fuer die Einordnung:
+
+- OCI ist der Standard.
+- Docker ist eine konkrete Implementierung dieses Standards.
+- Ein "Docker Image" ist in der Praxis meist ein OCI-kompatibles Image.
+- Dadurch koennen verschiedene Tools und Registries zusammenarbeiten.
+
+## Wie starte ich einen Docker Container?
 
 ```bash
 docker run hello-world
@@ -145,13 +151,13 @@ docker run hello-world
 3. Docker erstellt einen Container aus dem Image.
 4. Der Startbefehl wird ausgeführt.
 
-Das ist ein sehr guter erster Funktionstest für jede Docker-Umgebung.
+-> Guter erster Funktionstest für jede Docker-Umgebung.
 
-## Docker Engine in 60 Sekunden
+## Die Docker Engine
 
 - Das CLI nimmt den Befehl entgegen, z.B. `docker run`
 - Der Docker-Daemon verwaltet Images, Container, Netzwerke und Volumes
-- Die Registry liefert Images, wenn sie lokal noch nicht vorhanden sind
+- Fuer Container-Images kommuniziert Docker bei Bedarf mit einer Registry
 - Auf Linux läuft Docker direkt auf dem Kernel, auf Windows/macOS meist in einer Linux-VM
 
 ## Übung 1: Den ersten Container starten
@@ -170,7 +176,7 @@ docker run hello-world
 
 → `exercices/1_hello-world/`
 
-## Kurzfazit Block 1
+## Zusammenfassung Block 1
 
 - Ein `Image` ist der Bauplan, ein `Container` die laufende Instanz.
 - `docker run` ist Start, Download und Ausführung in einem Ablauf.
@@ -178,13 +184,11 @@ docker run hello-world
 
 ## Block 2: Images und Dockerfiles
 
-Ab hier wird Docker produktiv:
+Hier wird Docker produktiv:
 
 - wir bauen ein eigenes Image
 - wir beschreiben den Build reproduzierbar
 - wir trennen Dateien, Build-Schritte und Startbefehl
-
-Das passt direkt zu `exercices/2_small-web-server/`.
 
 ## Was ist ein Dockerfile?
 
@@ -270,15 +274,15 @@ docker run -d -p 80:80 --name simple-webserver simple-webserver
 
 → `exercices/2_small-web-server/`
 
-## Kurzfazit Block 2
+## Zusammenfassung Block 2
 
-- `Dockerfile` bedeutet: Build-Prozess dokumentieren statt manuell klicken.
+- `Dockerfile` bedeutet: Build-Prozess zu automatisieren und damit auch zu dokumentieren.
 - Layer-Caching spart Zeit und macht Builds schneller.
 - Gute Dockerfiles sind klein, klar und reproduzierbar.
 
 ## Block 3: Daten, Mounts und Netzwerke
 
-Jetzt kommt ein wichtiger Punkt in der Praxis:
+Wichtig in der Praxis:
 
 - Container sind nicht automatisch dauerhaft
 - Daten liegen nicht "einfach so" auf dem Host
@@ -291,7 +295,6 @@ Ein Container ist für Ausführung gedacht, nicht als dauerhafte Ablage.
 Wichtig dabei:
 
 - Änderungen im beschreibbaren Layer gehen beim Entfernen des Containers verloren
-- das ist kein Fehler, sondern Teil des Konzepts
 - Persistenz wird bewusst über Volumes oder Bind Mounts hergestellt
 
 ## Named Volumes vs. Bind Mounts
@@ -308,17 +311,9 @@ Beispiele aus der Praxis:
 
 ## Übung 3: Datenpersistenz
 
-Die Übung zeigt genau die drei Kernideen:
-
-1. Ein Container vergisst lokale Änderungen
-2. Ein Named Volume bewahrt Daten
-3. Ein Bind Mount verbindet Container und Host-Dateisystem
-
 → `exercices/3_datenpersistenz/`
 
 ## Docker-Netzwerke verstehen
-
-Für Übung 4 braucht es ein gemeinsames Modell:
 
 - Container im selben benutzerdefinierten Netzwerk erreichen sich über ihren Namen
 - `localhost` im Container ist nicht der Host
@@ -334,15 +329,9 @@ Für Übung 4 braucht es ein gemeinsames Modell:
 - Golang API
 - React-Client mit Nginx
 
-Die Übung zeigt hier sehr gut:
-
-- warum `db` im `DATABASE_URL` funktioniert
-- warum ein Netzwerk nötig ist
-- warum Datenbanken fast immer ein Volume brauchen
-
 → `exercices/4_application/`
 
-## Typische Fehlerbilder in Block 3
+## Typische Fehlerbilder bei Docker Netzwerken
 
 - Port ist schon belegt
 - Container spricht auf `localhost` statt auf den Service-Namen
@@ -352,7 +341,7 @@ Die Übung zeigt hier sehr gut:
 
 **Bewährte Diagnosebefehle:** `docker ps`, `docker logs <name>`, `docker volume ls`, `docker network ls`
 
-## Kurzfazit Block 3
+## Zusammenfassung Block 3
 
 - Persistenz muss bewusst geplant werden.
 - `Volume` und `Bind Mount` sind nicht dasselbe.
@@ -369,8 +358,6 @@ Compose ist praktisch, weil es:
 - Änderungen versionierbar macht
 
 ## Warum Compose?
-
-Ohne Compose besteht Übung 4 aus vielen `docker run`-Befehlen.
 
 Mit Compose werden Services, Netzwerke und Volumes in einer Datei beschrieben:
 
@@ -436,13 +423,11 @@ docker compose down
 
 Hier wendest du das Gelernte selbstständiger an.
 
-Sie erstellen:
+Aufgabe:
 
-- ein Dockerfile für das Python-Backend
-- ein Dockerfile für das Nginx-Frontend
-- eine `docker-compose.yml` für beide Services
-
-Hier überträgst du das Gelernte auf eine neue Struktur statt nur nachzubauen.
+- erstelle ein Dockerfile für das Python-Backend
+- erstelle ein Dockerfile für das Nginx-Frontend
+- erstelle eine `docker-compose.yml` für beide Services
 
 → `exercices/6_weather-app/`
 
@@ -481,7 +466,6 @@ Hinweis: `docker compose down -v` löscht auch Volumes und damit oft absichtlich
 
 - Compose macht Architektur lesbar und wartbar.
 - Service-Namen sind im Compose-Netzwerk gleichzeitig Kommunikationsnamen.
-- Für komplexere Szenarien lohnt sich der Hinweis auf `healthcheck` und strukturierte Fehlersuche.
 
 ## Block 5: Troubleshooting und nächste Schritte
 
@@ -558,3 +542,4 @@ Nach diesem Einstieg bieten sich als nächste Themen an:
 - Übungen: `exercices/`
 - Dokumentation: [docs.docker.com](https://docs.docker.com/)
 - Compose-Referenz: [docs.docker.com/compose](https://docs.docker.com/compose/)
+- Docker Tutorial: [Docker: Beginner to Pro](https://courses.devopsdirective.com/docker-beginner-to-pro)

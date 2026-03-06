@@ -1,22 +1,4 @@
 services:
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    networks:
-      - weather-net
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    networks:
-      - weather-net
-
-networks:
-  weather-net:
-    driver: bridge
