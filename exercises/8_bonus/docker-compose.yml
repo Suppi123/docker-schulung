@@ -1,0 +1,60 @@
+services:
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "?:80"           # Welcher Host-Port soll erreichbar sein?
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - ?
+      - ?
+    networks:
+      - ?                # nginx muss beide Backend-Services erreichen können
+      - ?
+    restart: unless-stopped
+
+  photoprism:
+    image: photoprism/photoprism:latest
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    environment:
+      PHOTOPRISM_ADMIN_USER: "admin"
+      PHOTOPRISM_ADMIN_PASSWORD: "insecure"
+      PHOTOPRISM_SITE_URL: "?"   # Unter welcher URL ist PhotoPrism für den Browser erreichbar?
+      PHOTOPRISM_DISABLE_TLS: "true"
+      PHOTOPRISM_DEFAULT_TLS: "false"
+      PHOTOPRISM_ORIGINALS_LIMIT: -1
+      PHOTOPRISM_HTTP_COMPRESSION: "gzip"
+      PHOTOPRISM_LOG_LEVEL: "info"
+      PHOTOPRISM_DISABLE_TENSORFLOW: "true"
+      PHOTOPRISM_DISABLE_FACES: "true"
+      PHOTOPRISM_DISABLE_CLASSIFICATION: "true"
+    volumes:
+      - ?:/photoprism/originals   # Fotos: Bind Mount oder Named Volume?
+      - ?:/photoprism/storage     # App-Daten (Index, Cache): Bind Mount oder Named Volume?
+    networks:
+      - ?                         # In welchem Netzwerk soll PhotoPrism sein?
+    restart: unless-stopped
+
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    user: "0:0"
+    environment:
+      FB_BASEURL: "?"             # Pfad-Prefix für den nginx-Router
+      FB_DATABASE: "/config/filebrowser.db"
+    volumes:
+      - ?:/srv                    # Fotos: Bind Mount oder Named Volume?
+      - ?:/config                 # App-Daten: Bind Mount oder Named Volume?
+    networks:
+      - ?                         # In welchem Netzwerk soll FileBrowser sein?
+    restart: unless-stopped
+
+volumes:
+  ?:
+  ?:
+
+networks:
+  photos:   # nginx ↔ photoprism
+  files:    # nginx ↔ filebrowser

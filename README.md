@@ -22,7 +22,7 @@ Wichtige Dateien:
 - `presentation/_quarto.yml`: Quarto-Konfiguration
 - `presentation/images/`: verwendete Bilder und Grafiken
 
-### `exercices/`
+### `exercises/`
 
 Enthaelt die praktischen Aufgaben zur Schulung. Die Uebungen bauen inhaltlich aufeinander auf und decken verschiedene Themenbereiche ab, zum Beispiel:
 

@@ -174,7 +174,7 @@ docker run hello-world
 - Welche Ausgabe kommt aus dem Container?
 - Was bleibt nach dem Beenden übrig, was nicht?
 
-→ `exercices/1_hello-world/`
+→ `exercises/1_hello-world/`
 
 ## Zusammenfassung Block 1
 
@@ -272,7 +272,7 @@ docker run -d -p 80:80 --name simple-webserver simple-webserver
 - Was wäre der Unterschied zwischen `COPY . .` und einem selektiven `COPY`?
 - Warum ist `-p 80:80` nötig?
 
-→ `exercices/2_small-web-server/`
+→ `exercises/2_small-web-server/`
 
 ## Zusammenfassung Block 2
 
@@ -311,7 +311,7 @@ Beispiele aus der Praxis:
 
 ## Übung 3: Datenpersistenz
 
-→ `exercices/3_datenpersistenz/`
+→ `exercises/3_datenpersistenz/`
 
 ## Docker-Netzwerke verstehen
 
@@ -329,7 +329,7 @@ Beispiele aus der Praxis:
 - Golang API
 - React-Client mit Nginx
 
-→ `exercices/4_application/`
+→ `exercises/4_application/`
 
 ## Typische Fehlerbilder bei Docker Netzwerken
 
@@ -417,7 +417,7 @@ docker compose ps
 docker compose down
 ```
 
-→ `exercices/5_docker-compose/`
+→ `exercises/5_docker-compose/`
 
 ## Übung 6: Wetter-App
 
@@ -429,7 +429,7 @@ Aufgabe:
 - erstelle ein Dockerfile für das Nginx-Frontend
 - erstelle eine `docker-compose.yml` für beide Services
 
-→ `exercices/6_weather-app/`
+→ `exercises/6_weather-app/`
 
 ## Übung 7: Praxisbeispiele mit Compose
 
@@ -446,7 +446,7 @@ Diese Beispiele zeigen typische reale Compose-Setups:
 - Welche Ports werden veröffentlicht?
 - Welche Einstellungen wirken produktionsnah?
 
-→ `exercices/7_example-projects/`
+→ `exercises/7_example-projects/`
 
 ## Compose-Troubleshooting
 
@@ -538,8 +538,8 @@ Nach diesem Einstieg bieten sich als nächste Themen an:
 
 ## Abschluss und Referenzen
 
-- Cheatsheet: `exercices/cheatsheet.md`
-- Übungen: `exercices/`
+- Cheatsheet: `exercises/cheatsheet.md`
+- Übungen: `exercises/`
 - Dokumentation: [docs.docker.com](https://docs.docker.com/)
 - Compose-Referenz: [docs.docker.com/compose](https://docs.docker.com/compose/)
 - Docker Tutorial: [Docker: Beginner to Pro](https://courses.devopsdirective.com/docker-beginner-to-pro)
