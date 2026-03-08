@@ -48,6 +48,20 @@ execute:
 
 </style>
 
+## Vorbereitung:
+
+- Ordner unter `/local/users/` mit eurer RZ-Kennung anlegen, z.B. `/local/users/rzuser99`
+- VirtualBox starten → **Datei → Einstellungen** → unter „Voreingestellter Pfad für VMs" diesen Ordner auswählen
+- Appliance importieren:
+  - Fertige Appliances liegen unter `/local/Appliances`
+  - Import über **Datei → Appliance importieren** – dabei unter „Voreingestellter Pfad für VMs" den eigenen Ordner unter `/local/users/` auswählen
+
+## Ressourcen
+
+[Repository](https://github.com/Suppi123/docker-schulung/tree/main)
+
+[VM](https://cloud.hs-augsburg.de/s/4kqpxk3BEJgHHJZ) (User / docker)
+
 
 ## Agenda:
 
@@ -58,6 +72,7 @@ execute:
 | 3 | Daten, Mounts und Netzwerke | Übungen 3 und 4 |
 | 4 | Multi-Container mit Compose | Übungen 5 bis 7 |
 | 5 | Troubleshooting, Registries und nächste Schritte | Referenz und Praxis |
+
 
 ## Lernziele
 
@@ -83,16 +98,15 @@ Docker löst in Entwicklung und Betrieb ein bekanntes Problem:
 
 **Mehrwert von Docker:** gleiche Startbasis auf vielen Systemen und schnell reproduzierbare Umgebungen.
 
-## Zentrale Begriffe
+## Von Bare Metal zu Containern
 
-| Begriff | Kurz erklärt |
-|---|---|
-| `Image` | Bauplan einer Anwendung |
-| `Container` | laufende Instanz eines Images |
-| `Registry` | Speicherort für Images |
-| `Volume` | persistenter Speicher außerhalb des Containers |
-| `Network` | Verbindung zwischen Containern |
-| `Docker Compose` | Beschreibung mehrerer Services in YAML |
+Wie hat sich die Bereitstellung von Anwendungen entwickelt?
+
+::: {.incremental}
+1. **Bare Metal** – Anwendungen direkt auf der Hardware, alles teilt sich dasselbe System
+2. **Virtual Machines** – Isolation durch eigene Betriebssysteme, aber ressourcenintensiv
+3. **Container** – leichtgewichtige Isolation, schnell startbar, portabel
+:::
 
 ## Bare Metal
 
@@ -127,18 +141,19 @@ Container sind leichter als VMs und teilen sich den Kernel des Hosts.
 
 Die `Open Container Initiative (OCI)` definiert offene Standards für Container.
 
-| OCI-Spezifikation | Beschreibt |
-|---|---|
-| `Image Specification` | Aufbau und Metadaten eines Images |
-| `Runtime Specification` | wie ein Container aus einem Image gestartet wird |
-| `Distribution Specification` | Austausch über Registries, Push und Pull |
-
-Wichtig fuer die Einordnung:
+Wichtig für die Einordnung:
 
 - OCI ist der Standard.
 - Docker ist eine konkrete Implementierung dieses Standards.
 - Ein "Docker Image" ist in der Praxis meist ein OCI-kompatibles Image.
-- Dadurch koennen verschiedene Tools und Registries zusammenarbeiten.
+- Dadurch können verschiedene Tools und Registries zusammenarbeiten.
+
+## Die Docker Engine
+
+- Das CLI nimmt den Befehl entgegen, z.B. `docker run`
+- Der Docker-Daemon verwaltet Images, Container, Netzwerke und Volumes
+- Für Container-Images kommuniziert Docker bei Bedarf mit einer Registry
+- Auf Linux läuft Docker direkt auf dem Kernel, auf Windows/macOS meist in einer Linux-VM
 
 ## Wie starte ich einen Docker Container?
 
@@ -153,16 +168,18 @@ docker run hello-world
 
 -> Guter erster Funktionstest für jede Docker-Umgebung.
 
-## Die Docker Engine
+## Zentrale Begriffe
 
-- Das CLI nimmt den Befehl entgegen, z.B. `docker run`
-- Der Docker-Daemon verwaltet Images, Container, Netzwerke und Volumes
-- Fuer Container-Images kommuniziert Docker bei Bedarf mit einer Registry
-- Auf Linux läuft Docker direkt auf dem Kernel, auf Windows/macOS meist in einer Linux-VM
+| Begriff | Kurz erklärt |
+|---|---|
+| `Image` | Vorlage / Template |
+| `Container` | laufende Instanz eines Images |
+| `Registry` | Speicherort für Images |
+| `Volume` | persistenter Speicher außerhalb des Containers |
+| `Network` | Verbindung zwischen Containern |
+| `Docker Compose` | Beschreibung mehrerer Services in YAML |
 
 ## Übung 1: Den ersten Container starten
-
-**Ziel:** Prüfen, ob Docker läuft und das Grundprinzip sichtbar machen.
 
 ```bash
 docker run hello-world
@@ -180,11 +197,8 @@ docker run hello-world
 
 - Ein `Image` ist der Bauplan, ein `Container` die laufende Instanz.
 - `docker run` ist Start, Download und Ausführung in einem Ablauf.
-- Der Einstieg mit `hello-world` zeigt das Prinzip sofort und ohne viel Vorwissen.
 
 ## Block 2: Images und Dockerfiles
-
-Hier wird Docker produktiv:
 
 - wir bauen ein eigenes Image
 - wir beschreiben den Build reproduzierbar
@@ -201,17 +215,6 @@ Typische Reihenfolge:
 3. Abhängigkeiten installieren
 4. Anwendung kopieren
 5. Startbefehl festlegen
-
-## Wichtige Dockerfile-Anweisungen
-
-| Anweisung | Zweck |
-|---|---|
-| `FROM` | Basis-Image festlegen |
-| `WORKDIR` | Arbeitsordner setzen |
-| `COPY` | Dateien ins Image kopieren |
-| `RUN` | Build-Schritt ausführen |
-| `EXPOSE` | genutzten Port dokumentieren |
-| `CMD` | Standard-Startbefehl definieren |
 
 ## Layer und Caching
 
@@ -234,11 +237,13 @@ Warum diese Reihenfolge?
 - Docker kann den `npm ci`-Schritt wiederverwenden.
 - Builds werden dadurch lokal und in CI deutlich schneller.
 
+## Container Filesystem
+
+![Container Filesystem](images/container_filesystem.png){width=70%}
+
 ## Build-Kontext und `.dockerignore`
 
 Beim Bauen wird ein Kontext an Docker gesendet. Alles im Kontext kostet Zeit und kann Probleme verursachen.
-
-![.dockerignore](images/dockerignore.png){width=72%}
 
 `.dockerignore` sollte mindestens ausschließen:
 
@@ -256,6 +261,18 @@ Beim Bauen wird ein Kontext an Docker gesendet. Alles im Kontext kostet Zeit und
 - ein Container, eine Hauptaufgabe
 - Reihenfolge im Dockerfile cache-freundlich wählen
 - `EXPOSE` dokumentiert den Port, gibt ihn aber nicht automatisch frei
+
+## Wichtige Dockerfile-Anweisungen
+
+| Anweisung | Zweck |
+|---|---|
+| `FROM` | Basis-Image festlegen |
+| `WORKDIR` | Arbeitsordner setzen |
+| `COPY` | Dateien ins Image kopieren |
+| `RUN` | Build-Schritt ausführen |
+| `EXPOSE` | genutzten Port dokumentieren |
+| `CMD` | Standard-Startbefehl definieren |
+
 
 ## Übung 2: Einfacher Webserver
 
@@ -402,8 +419,6 @@ Das ist wichtig, weil es in Projekten oft falsch verstanden wird.
 - es prüft nicht automatisch, ob die Datenbank schon Anfragen annimmt
 - für robuste Setups helfen `healthcheck`, Retry-Logik oder ein Wait-Script
 
-Für den Einstieg reicht oft zuerst das Grundmodell. Später kannst du mit `healthcheck` oder Retry-Logik nachschärfen.
-
 ## Übung 5: Von `docker run` zu Compose
 
 **Ziel:** Die Multi-Container-Anwendung aus Übung 4 in YAML ausdrücken.
@@ -419,9 +434,23 @@ docker compose down
 
 → `exercises/5_docker-compose/`
 
+## Compose-Troubleshooting
+
+Die wichtigsten Befehle:
+
+| Befehl | Nutzen |
+|---|---|
+| `docker compose config` | YAML prüfen und aufgelöst anzeigen |
+| `docker compose ps` | Status sehen |
+| `docker compose logs -f` | Logs live verfolgen |
+| `docker compose exec <service> sh` | in einen Service hineinschauen |
+| `docker compose down` | Umgebung sauber abbauen |
+
+Hinweis: `docker compose down -v` löscht auch Volumes und damit oft absichtlich gespeicherte Daten.
+
 ## Übung 6: Wetter-App
 
-Hier wendest du das Gelernte selbstständiger an.
+Selbstständige Anwendung des gelernten.
 
 Aufgabe:
 
@@ -447,20 +476,6 @@ Diese Beispiele zeigen typische reale Compose-Setups:
 - Welche Einstellungen wirken produktionsnah?
 
 → `exercises/7_example-projects/`
-
-## Compose-Troubleshooting
-
-Die wichtigsten Befehle:
-
-| Befehl | Nutzen |
-|---|---|
-| `docker compose config` | YAML prüfen und aufgelöst anzeigen |
-| `docker compose ps` | Status sehen |
-| `docker compose logs -f` | Logs live verfolgen |
-| `docker compose exec <service> sh` | in einen Service hineinschauen |
-| `docker compose down` | Umgebung sauber abbauen |
-
-Hinweis: `docker compose down -v` löscht auch Volumes und damit oft absichtlich gespeicherte Daten.
 
 ## Kurzfazit Block 4
 
