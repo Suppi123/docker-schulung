@@ -35,7 +35,7 @@ Erstelle eine `docker-compose.yml`, die:
 - Den Frontend-Port 8080 auf dem Host exponiert
 - Sicherstellt, dass das Frontend erst startet, wenn das Backend bereit ist (`depends_on`)
 
-**Hinweis:** Die Nginx-Konfiguration im Frontend proxied Anfragen unter `/api/` an den Backend-Container.
+**Hinweis:** Die Nginx-Konfiguration im Frontend leitet Anfragen unter `/api/` an den Backend-Container weiter.
 
 ## Lösung ausführen
 

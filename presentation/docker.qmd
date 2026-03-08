@@ -255,7 +255,7 @@ Beim Bauen wird ein Kontext an Docker gesendet. Alles im Kontext kostet Zeit und
 
 ## Dockerfile-Best-Practices
 
-- kleine Basis-Images bevorzugen, z.B. `alpine` nur wenn passend
+- kleine Basis-Images bevorzugen, z.B. `alpine`, nur wenn passend
 - Tags bewusst setzen statt blind `latest` zu verwenden
 - keine Zugangsdaten in Images kopieren
 - ein Container, eine Hauptaufgabe
@@ -328,7 +328,7 @@ Beispiele aus der Praxis:
 
 ## Übung 3: Datenpersistenz
 
-→ `exercises/3_datenpersistenz/`
+→ `exercises/3_datenpersistence/`
 
 ## Docker-Netzwerke verstehen
 
