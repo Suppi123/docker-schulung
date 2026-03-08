@@ -54,7 +54,7 @@ execute:
 - VirtualBox starten → **Datei → Einstellungen** → unter „Voreingestellter Pfad für VMs" diesen Ordner auswählen
 - Appliance importieren:
   - Fertige Appliances liegen unter `/local/Appliances`
-  - Import über **Datei → Appliance importieren** – dabei unter „Voreingestellter Pfad für VMs" den eigenen Ordner unter `/local/users/` auswählen
+  - Import über **Datei → Appliance importieren**
 
 ## Ressourcen
 
