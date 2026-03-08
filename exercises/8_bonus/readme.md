@@ -95,7 +95,7 @@ Schau dir `nginx/nginx.conf` an. Nginx erwartet:
 
 Beide Anwendungen müssen wissen, unter welchem Pfad sie erreichbar sind:
 - `PHOTOPRISM_SITE_URL` – vollständige URL inkl. Pfad (z. B. `http://localhost:8080/photos/`)
-- `FB_BASEURL` – nur der Pfad (z. B. `/files`)
+- `--baseURL` – FileBrowser erhält den Pfad als Command-Flag (z. B. `"--baseURL", "/files"`)
 
 ### 3. Stack starten
 
@@ -114,7 +114,7 @@ docker compose logs -f
 | Anwendung   | URL                            | Zugangsdaten      |
 |-------------|--------------------------------|-------------------|
 | PhotoPrism  | http://localhost:8080/photos/  | admin / insecure  |
-| FileBrowser | http://localhost:8080/files/   | admin / admin     |
+| FileBrowser | http://localhost:8080/files/   | admin / insecure  |
 
 Teste: Lade über FileBrowser ein Foto hoch. Starte in PhotoPrism einen Index-Scan  
 (*Library → Index*). Das Foto sollte erscheinen – beide Container greifen auf dasselbe Verzeichnis zu.
