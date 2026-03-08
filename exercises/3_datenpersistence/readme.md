@@ -42,7 +42,7 @@ Einen neuen Container starten und prüfen, ob die Datei noch vorhanden ist:
 ```
 docker run -it --rm ubuntu:22.04
 
-cat my-data/hello.txt # Fehler: `cat: my-data/hello.txt: No such file or directory`
+cat my-data/hello.txt
 ```
 
 ### Volume Mounts
@@ -74,9 +74,6 @@ exit
 Einen Container starten und ein Verzeichnis vom Host-System einbinden:
 
 ```
-# Lange Schreibweise mit --mount
-docker run -it --rm --mount type=bind,source="${PWD}"/my-data,destination=/my-data ubuntu:22.04
-
 # Kurze Schreibweise mit -v (bewirkt dasselbe)
 docker run -it --rm -v ${PWD}/my-data:/my-data ubuntu:22.04
 
