@@ -78,4 +78,4 @@ Das Netzwerk entfernen:
 
 Ein vollständiges Aufräumen des Systems ist möglich mit:
 
-`docker system pune -a`
+`docker system prune -a`

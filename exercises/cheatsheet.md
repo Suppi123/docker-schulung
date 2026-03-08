@@ -24,7 +24,7 @@ Offizielle Dokumentation: https://docs.docker.com/engine/reference/run/
 ```
 
 ## Docker Compose
-Offiziell Dokumentation: https://docs.docker.com/reference/cli/docker/compose/
+Offizielle Dokumentation: https://docs.docker.com/reference/cli/docker/compose/
 
 `docker compose OPTIONS`
 ```

@@ -26,7 +26,7 @@ Password-Manager (Bitwarden-kompatibel).
 #### Herausforderungen
 Auth-Demo mit DB-Volume, skalierbar für Multi-Service
 
-### Home Assistend
+### Home Assistant
 #### Beschreibung
 Home-Automation-Hub
 #### Herausforderungen
