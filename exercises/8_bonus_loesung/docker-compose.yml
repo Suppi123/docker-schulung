@@ -1,0 +1,102 @@
+services:
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Nginx: einziger Service mit Port-Mapping zum Host.
+  # Routet Anfragen per Pfad an die internen Services weiter.
+  #
+  # Netzwerke: nginx ist in BEIDEN Netzwerken, weil es als einziger Service
+  # mit beiden Backends sprechen muss.
+  # ──────────────────────────────────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"           # nur nginx ist von außen erreichbar
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - photoprism
+      - filebrowser
+    networks:
+      - photos
+      - files
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # PhotoPrism: Foto-Management-Anwendung.
+  #
+  # Netzwerk: nur im „photos"-Netzwerk → kann FileBrowser nicht erreichen
+  # und umgekehrt. Principle of Least Privilege.
+  #
+  # Volumes:
+  #   ./photos   → Bind Mount  → Host-Verzeichnis direkt eingebunden.
+  #                              Benutzer können Fotos auch außerhalb des
+  #                              Containers lesen/schreiben/löschen.
+  #
+  #   photoprism_storage → Named Volume → PhotoPrism-Anwendungsdaten
+  #                        (Datenbank, Thumbnails, Cache). Kein direkter
+  #                        Zugriff vom Host nötig – Docker verwaltet das.
+  # ──────────────────────────────────────────────────────────────────────────
+  photoprism:
+    image: photoprism/photoprism:latest
+    security_opt:
+      - seccomp:unconfined    # benötigt für mmap-Datenbankzugriff
+      - apparmor:unconfined
+    environment:
+      PHOTOPRISM_ADMIN_USER: "admin"
+      PHOTOPRISM_ADMIN_PASSWORD: "insecure"
+      PHOTOPRISM_SITE_URL: "http://localhost:8080/photos/"   # Pfad-Prefix für nginx
+      PHOTOPRISM_DISABLE_TLS: "true"
+      PHOTOPRISM_DEFAULT_TLS: "false"
+      PHOTOPRISM_ORIGINALS_LIMIT: -1
+      PHOTOPRISM_HTTP_COMPRESSION: "gzip"
+      PHOTOPRISM_LOG_LEVEL: "info"
+      PHOTOPRISM_DISABLE_TENSORFLOW: "true"   # KI-Features deaktiviert (ressourcenschonend)
+      PHOTOPRISM_DISABLE_FACES: "true"
+      PHOTOPRISM_DISABLE_CLASSIFICATION: "true"
+    volumes:
+      - ./photos:/photoprism/originals        # Bind Mount: geteiltes Foto-Verzeichnis
+      - photoprism_storage:/photoprism/storage # Named Volume: App-Daten
+    networks:
+      - photos
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # FileBrowser: Web-basierter Dateimanager.
+  #
+  # Netzwerk: nur im „files"-Netzwerk → kann PhotoPrism nicht erreichen
+  # und umgekehrt.
+  #
+  # Volumes:
+  #   ./photos   → Bind Mount  → dasselbe Host-Verzeichnis wie PhotoPrism!
+  #                              Dateien, die hier hochgeladen werden, sind
+  #                              sofort in PhotoPrism sichtbar (nach Index).
+  #
+  #   filebrowser_data → Named Volume → SQLite-Datenbank von FileBrowser.
+  # ──────────────────────────────────────────────────────────────────────────
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    user: "0:0"
+    # --baseurl als Flag statt Umgebungsvariable: FileBrowser speichert
+    # seine Einstellungen in settings.json im Volume. Beim ersten Start
+    # wird die Datei ohne baseurl angelegt, was spätere FB_BASEURL-Env-Vars
+    # überschreibt. Das Flag hingegen hat immer höchste Priorität.
+    command: [
+      "--baseURL", "/files",
+      "--database", "/config/filebrowser.db",
+      "--username", "admin",
+      "--password", "$$2a$$10$$d/./aG0wsv3mGIZUM3Tj8u3uijEaWGesTyep7XRfdtqyT3k0TkwIS"
+    ]   # Passwort: insecure
+    volumes:
+      - ./photos:/srv                         # Bind Mount: geteiltes Foto-Verzeichnis
+      - filebrowser_data:/config              # Named Volume: FileBrowser-Datenbank
+    networks:
+      - files
+    restart: unless-stopped
+
+volumes:
+  photoprism_storage:   # Anwendungsdaten von PhotoPrism (Thumbnails, Index, Cache)
+  filebrowser_data:     # Konfigurationsdatenbank von FileBrowser
+
+networks:
+  photos:   # nginx ↔ photoprism
+  files:    # nginx ↔ filebrowser
