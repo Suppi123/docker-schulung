@@ -11,7 +11,7 @@ Zusätzlich demonstriert es Netzwerk-Isolation: zwei getrennte interne Netzwerke
 ```
 Host-System
     │
-    └── Port 8080
+    └── Port 80
            │
       ┌────▼─────┐
       │  nginx   │  ← einziger nach außen erreichbarer Service
@@ -36,8 +36,8 @@ PhotoPrism und FileBrowser sind in **getrennten Netzwerken** – sie können sic
 
 | URL                          | Service       |
 |------------------------------|---------------|
-| http://localhost:8080/photos/ | PhotoPrism   |
-| http://localhost:8080/files/  | FileBrowser  |
+| http://localhost/photos/ | PhotoPrism   |
+| http://localhost/files/  | FileBrowser  |
 
 ---
 
@@ -78,7 +78,7 @@ FileBrowsers SQLite-Datenbank (Benutzer, Einstellungen) liegt ebenfalls in einem
 
 ## Netzwerk-Isolation
 
-Nur nginx hat ein Port-Mapping (`8080:80`) und ist damit vom Host erreichbar.  
+Nur nginx hat ein Port-Mapping (`80:80`) und ist damit vom Host erreichbar.  
 PhotoPrism und FileBrowser sind **ausschließlich im internen Docker-Netzwerk** erreichbar –  
 von außen nicht direkt ansprechbar, auch wenn sie intern auf ihren Ports lauschen.
 
@@ -114,8 +114,8 @@ Sobald PhotoPrism `"http server running"` meldet, ist es bereit.
 
 | Anwendung    | URL                            | Zugangsdaten        |
 |--------------|--------------------------------|---------------------|
-| PhotoPrism   | http://localhost:8080/photos/  | admin / insecure    |
-| FileBrowser  | http://localhost:8080/files/   | admin / insecure    |
+| PhotoPrism   | http://localhost/photos/  | admin / insecure    |
+| FileBrowser  | http://localhost/files/   | admin / insecure    |
 
 ---
 
@@ -160,7 +160,7 @@ Bei einem Named Volume verwaltet Docker den Speicherort – `docker volume inspe
 curl http://localhost:2342   # → Connection refused
 
 # Nur über nginx erreichbar:
-curl http://localhost:8080/photos/   # → funktioniert
+curl http://localhost/photos/   # → funktioniert
 ```
 
 ### Aufgabe 5: Netzwerk-Isolation prüfen
@@ -189,7 +189,7 @@ exit
 Schau dir `nginx/nginx.conf` an und beantworte:
 - Warum hat `proxy_pass http://photoprism:2342` keinen trailing slash?
 - Warum wird WebSocket-Support nur für PhotoPrism, nicht für FileBrowser benötigt?
-- Was passiert, wenn du `http://localhost:8080/` (ohne Pfad) aufrufst?
+- Was passiert, wenn du `http://localhost/` (ohne Pfad) aufrufst?
 
 ---
 

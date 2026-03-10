@@ -16,7 +16,7 @@ Nginx ist bereits fertig konfiguriert – du musst nur die `docker-compose.yml` 
 ```
 Host-System
     │
-    └── Port 8080
+    └── Port 80
            │
       ┌────▼─────┐
       │  nginx   │  ← einziger nach außen erreichbarer Service
@@ -37,8 +37,8 @@ Host-System
 
 | URL                          | Service      |
 |------------------------------|--------------|
-| http://localhost:8080/photos/ | PhotoPrism  |
-| http://localhost:8080/files/  | FileBrowser |
+| http://localhost/photos/ | PhotoPrism  |
+| http://localhost/files/  | FileBrowser |
 
 ---
 
@@ -55,7 +55,7 @@ mkdir photos
 Ersetze alle `?` in der `docker-compose.yml`. Orientiere dich an folgenden Fragen:
 
 #### Port
-- Welcher Service soll auf Port `8080` des Hosts erreichbar sein?
+- Welcher Service soll auf Port `80` des Hosts erreichbar sein?
 
 #### depends_on
 - nginx sollte erst starten, wenn beide Anwendungen bereit sind. Welche Services sind das?
@@ -94,7 +94,7 @@ Schau dir `nginx/nginx.conf` an. Nginx erwartet:
 - FileBrowser unter dem Pfad `/files/`
 
 Beide Anwendungen müssen wissen, unter welchem Pfad sie erreichbar sind:
-- `PHOTOPRISM_SITE_URL` – vollständige URL inkl. Pfad (z. B. `http://localhost:8080/photos/`)
+- `PHOTOPRISM_SITE_URL` – vollständige URL inkl. Pfad (z. B. `http://localhost/photos/`)
 - `--baseURL` – FileBrowser erhält den Pfad als Command-Flag (z. B. `"--baseURL", "/files"`)
 
 ### 3. Stack starten
@@ -113,8 +113,8 @@ docker compose logs -f
 
 | Anwendung   | URL                            | Zugangsdaten      |
 |-------------|--------------------------------|-------------------|
-| PhotoPrism  | http://localhost:8080/photos/  | admin / insecure  |
-| FileBrowser | http://localhost:8080/files/   | admin / insecure  |
+| PhotoPrism  | http://localhost/photos/  | admin / insecure  |
+| FileBrowser | http://localhost/files/   | admin / insecure  |
 
 Teste: Lade über FileBrowser ein Foto hoch. Starte in PhotoPrism einen Index-Scan  
 (*Library → Index*). Das Foto sollte erscheinen – beide Container greifen auf dasselbe Verzeichnis zu.

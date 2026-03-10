@@ -10,7 +10,7 @@ services:
   nginx:
     image: nginx:alpine
     ports:
-      - "8080:80"           # nur nginx ist von außen erreichbar
+      - "80:80"           # nur nginx ist von außen erreichbar
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
@@ -44,7 +44,7 @@ services:
     environment:
       PHOTOPRISM_ADMIN_USER: "admin"
       PHOTOPRISM_ADMIN_PASSWORD: "insecure"
-      PHOTOPRISM_SITE_URL: "http://localhost:8080/photos/"   # Pfad-Prefix für nginx
+      PHOTOPRISM_SITE_URL: "http://localhost/photos/"   # Pfad-Prefix für nginx (Port 80)
       PHOTOPRISM_DISABLE_TLS: "true"
       PHOTOPRISM_DEFAULT_TLS: "false"
       PHOTOPRISM_ORIGINALS_LIMIT: -1
